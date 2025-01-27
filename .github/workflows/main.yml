@@ -58,3 +58,23 @@ jobs:
           kubectl get pods
           kubectl get services
           kubectl get ingress
+          
+
+      - name: Test Application Endpoints
+        run: |
+          # Wait for pods to be ready
+          kubectl wait --for=condition=ready pod -l app=rick-morty --timeout=2m
+          
+          # Get the service port
+          PORT=$(kubectl get service rick-morty-cluster-ip -o jsonpath="{.spec.ports[0].port}")
+          
+          # Forward the port
+          kubectl port-forward service/rick-morty-cluster-ip 8080:$PORT &
+          sleep 10  # Give it time to establish the connection
+          
+          # Test endpoints
+          curl http://localhost:8080/healthcheck
+          curl http://localhost:8080/rickandmorty
+          
+          # Cleanup port forwarding
+          pkill -f "port-forward"

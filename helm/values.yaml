@@ -1,0 +1,34 @@
+replicaCount: 3
+image:
+  repository: ilay123123/k8s_mission
+  tag: test
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: "192.168.49.2.nip.io"
+  paths:
+    - path: /rickandmorty
+      pathType: Prefix
+    - path: /healthcheck
+      pathType: Prefix
+    - path: /
+      pathType: Prefix
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /rickandmorty
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
